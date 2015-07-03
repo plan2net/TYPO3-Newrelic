@@ -3,8 +3,8 @@ TYPO3 Extension
 
 Allows to configure the Newrelic appname and sets specific transaction names for Newrelic by using the PHP API: https://docs.newrelic.com/docs/php/the-php-api
 
-Default Transaction Names
-=========================
+## Default Transaction Names
+
 The following transaction names are set in the extension:
 * Base (is the very default transaction name - set in ext_localconf.php)
 * Frontend-Pre (is the very default transaction name for the frontend index.php, that is normaly overriden in the rendering process.)
@@ -19,20 +19,20 @@ All names may be postfixed by:
 * CliMode
 
 
-Extra Metrics
-=============
+## Extra Metrics
+
 Custom/MemoryUsage/RealSize
 Custom/MemoryUsageExtracache/RealSize
 
-Extra Parameters (for Trace view)
-=================================
-TYPO3-NOCACHE
-TYPO3-INTincScript
-TYPO3-ClientCacheable
+
+## Extra Parameters (for Trace view)
+
+TYPO3-NOCACHE  
+TYPO3-INTincScript  
+TYPO3-ClientCacheable  
 
 
-Usage In Extensions
-===================
+## Usage In Extensions
 
 ```php
 // You may want to set a custom transaction name:
