@@ -1,0 +1,24 @@
+{
+  "name": "reelworx/newrelic",
+  "description": "Allows to configure appname and sets specific transaction names for Newrelic by using the PHP API: https://docs.newrelic.com/docs/php/the-php-api.",
+  "type": "typo3-cms-extension",
+  "license": "GPL-2.0+",
+  "authors": [
+    {
+      "name": "Reelworx GmbH",
+      "role": "Developer",
+      "homepage": "http://reelworx.at/"
+    }
+  ],
+  "replace": {
+    "newrelic": "*"
+  },
+  "require": {
+    "typo3/cms-core": "~6.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "AOE\\Newrelic\\": "Classes/"
+    }
+  }
+}

@@ -1,6 +1,8 @@
 <?php
-
 namespace AOE\Newrelic;
+
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 
 /**
  * Class Service
@@ -9,7 +11,8 @@ namespace AOE\Newrelic;
  *  $service->setTransactionName('Product Single View');
  * @package AOE\Newrelic
  */
-class Service implements \t3lib_Singleton {
+class Service implements SingletonInterface
+{
 
     /**
      * @var array
@@ -37,20 +40,22 @@ class Service implements \t3lib_Singleton {
     protected $transactionNamePostfix = '';
 
     /**
-     *
+     * Cosntructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['newrelic']);
     }
 
     /**
      * sets the configured app name to newrelic
      */
-    public function setConfiguredAppName() {
+    public function setConfiguredAppName()
+    {
         if (!extension_loaded('newrelic')) {
             return;
         }
-        $name = "TYPO3 Portal";
+        $name = 'TYPO3 Portal';
         if (isset($this->configuration['appname']) && !empty($this->configuration['appname'])) {
             $name = $this->configuration['appname'];
         }
@@ -60,32 +65,59 @@ class Service implements \t3lib_Singleton {
     /**
      * @param string $categoryPostfix
      */
-    public function addMemoryUsageCustomMetric($categoryPostfix = '') {
+    public function addMemoryUsageCustomMetric($categoryPostfix = '')
+    {
         if (!function_exists('memory_get_usage')) {
             return;
         }
-        if (!isset($this->configuration['track_memory']) || $this->configuration['track_memory'] != 1) {
+        if (!isset($this->configuration['track_memory']) || !$this->configuration['track_memory']) {
             return;
         }
         $memoryUsage = memory_get_usage(true);
-        $this->setCustomMetric('MemoryUsage'.$categoryPostfix,'RealSize',$memoryUsage);
-        $this->setCustomMetric('MemoryUsage'.$categoryPostfix.$this->transactionNamePostfix,'RealSize',$memoryUsage);
+        $this->setCustomMetric('MemoryUsage' . $categoryPostfix, 'RealSize', $memoryUsage);
+        $this->setCustomMetric('MemoryUsage' . $categoryPostfix . $this->transactionNamePostfix, 'RealSize', $memoryUsage);
         $this->setCustomParameter("MemoryUsage-RealSize", $memoryUsage);
         $this->setCustomParameter("MemoryUsage-Size", memory_get_usage());
         if (!function_exists('memory_get_peak_usage')) {
             return;
         }
         $memoryUsage = memory_get_peak_usage(true);
-        $this->setCustomMetric('MemoryUsage'.$categoryPostfix,'RealPeakSize',$memoryUsage);
-        $this->setCustomMetric('MemoryUsage'.$categoryPostfix.$this->transactionNamePostfix,'RealPeakSize',$memoryUsage);
+        $this->setCustomMetric('MemoryUsage' . $categoryPostfix, 'RealPeakSize', $memoryUsage);
+        $this->setCustomMetric('MemoryUsage' . $categoryPostfix . $this->transactionNamePostfix, 'RealPeakSize', $memoryUsage);
         $this->setCustomParameter("MemoryUsage-RealPeakSize", $memoryUsage);
         $this->setCustomParameter("MemoryUsage-PeakSize", memory_get_peak_usage());
     }
 
     /**
+     * @param $category
+     * @param $key
+     * @param $value
+     */
+    public function setCustomMetric($category, $key, $value)
+    {
+        if (!extension_loaded('newrelic')) {
+            return;
+        }
+        newrelic_custom_metric("Custom/" . $category . "/" . $key, $value);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function setCustomParameter($key, $value)
+    {
+        if (!extension_loaded('newrelic')) {
+            return;
+        }
+        newrelic_add_custom_parameter($key, $value);
+    }
+
+    /**
      * adds some flags based from TSFE object
      */
-    public function addTslibFeCustomParameters() {
+    public function addTslibFeCustomParameters()
+    {
         if (!isset($GLOBALS['TSFE'])) {
             return;
         }
@@ -100,37 +132,35 @@ class Service implements \t3lib_Singleton {
             $this->setCustomParameter("TYPO3-ClientCacheable", 1);
         }
         if (isset($tsfe->pageCacheTags) && is_array($tsfe->pageCacheTags)) {
-            $this->setCustomParameter('X-CacheTags',implode('|', $tsfe->pageCacheTags).'|');
+            $this->setCustomParameter('X-CacheTags', implode('|', $tsfe->pageCacheTags) . '|');
         }
         // @var tslib_feUserAuth
         $frontEndUser = $GLOBALS['TSFE']->fe_user;
         if ($this->isFrontendUserActive($frontEndUser)) {
-            $this->setCustomParameter('FrontendUser','yes');
-        }
-        else {
-            $this->setCustomParameter('FrontendUser','no');
+            $this->setCustomParameter('FrontendUser', 'yes');
+        } else {
+            $this->setCustomParameter('FrontendUser', 'no');
         }
 
     }
 
     /**
-     * @param tslib_feUserAuth $frontendUser
+     * @param FrontendUserAuthentication $frontendUser
      * @return bool
      */
-    protected function isFrontendUserActive($frontendUser) {
-        if (!$frontendUser instanceof tslib_feUserAuth) {
+    protected function isFrontendUserActive(FrontendUserAuthentication $frontendUser = NULL)
+    {
+        if (!$frontendUser instanceof FrontendUserAuthentication) {
             return false;
         }
-        if (isset($frontendUser->user['uid']) && $frontendUser->user['uid']) {
-            return true;
-        }
-        return false;
+        return !empty($frontendUser->user['uid']);
     }
 
     /**
      * adds some env variables
      */
-    public function addCommonRequestParameters() {
+    public function addCommonRequestParameters()
+    {
         $this->setCustomParameter("REQUEST_URI", \t3lib_div::getIndpEnv('REQUEST_URI'));
         $this->setCustomParameter("REMOTE_ADDR", \t3lib_div::getIndpEnv('REMOTE_ADDR'));
         $this->setCustomParameter("HTTP_USER_AGENT", \t3lib_div::getIndpEnv('HTTP_USER_AGENT'));
@@ -139,67 +169,20 @@ class Service implements \t3lib_Singleton {
     }
 
     /**
-     * @param $key
-     * @param $value
-     */
-    public function setCustomParameter($key,$value) {
-        if (!extension_loaded('newrelic')) {
-            return;
-        }
-        newrelic_add_custom_parameter ($key, $value);
-    }
-
-    /**
-     * @param $category
-     * @param $key
-     * @param $value
-     */
-    public function setCustomMetric($category,$key,$value) {
-        if (!extension_loaded('newrelic')) {
-            return;
-        }
-        newrelic_custom_metric ("Custom/".$category."/".$key, $value);
-    }
-
-    /**
      * sets the configured transaction name to newrelic
      * @param $name
      */
-    public function setTransactionNameDefault($name) {
-       $this->transactionNameDefault = $name;
-       $this->setNewrelicTransactionName();
-    }
-
-    /**
-     * sets the configured transaction name to newrelic
-     * @param $name
-     */
-    public function setTransactionName($name) {
-        $this->transactionName = $name;
+    public function setTransactionNameDefault($name)
+    {
+        $this->transactionNameDefault = $name;
         $this->setNewrelicTransactionName();
     }
 
     /**
-     * sets the configured transaction name to newrelic
-     * @param $name
+     * @return void
      */
-    public function setTransactionNameOverride($name) {
-        $this->transactionNameOverride = $name;
-        $this->setNewrelicTransactionName();
-    }
-
-    public function addTransactionNamePostfix($name) {
-        if (empty($name)) {
-            return;
-        }
-        $this->transactionNamePostfix .= '-'.$name;
-        $this->setNewrelicTransactionName();
-    }
-
-    /**
-     * @param $name
-     */
-    protected function setNewrelicTransactionName() {
+    protected function setNewrelicTransactionName()
+    {
         if (!extension_loaded('newrelic')) {
             return;
         }
@@ -215,7 +198,41 @@ class Service implements \t3lib_Singleton {
         }
         if (!is_null($name)) {
             $name .= $this->transactionNamePostfix;
-            newrelic_name_transaction ($name);
+            newrelic_name_transaction($name);
         }
+    }
+
+    /**
+     * sets the configured transaction name to newrelic
+     * @param $name
+     */
+    public function setTransactionName($name)
+    {
+        $this->transactionName = $name;
+        $this->setNewrelicTransactionName();
+    }
+
+    /**
+     * sets the configured transaction name to newrelic
+     * @param $name
+     */
+    public function setTransactionNameOverride($name)
+    {
+        $this->transactionNameOverride = $name;
+        $this->setNewrelicTransactionName();
+    }
+
+    /**
+     * Append a postfix to the current transaction name
+     *
+     * @param $name
+     */
+    public function addTransactionNamePostfix($name)
+    {
+        if (empty($name)) {
+            return;
+        }
+        $this->transactionNamePostfix .= '-' . $name;
+        $this->setNewrelicTransactionName();
     }
 }

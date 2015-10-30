@@ -36,7 +36,7 @@ TYPO3-ClientCacheable
 
 ```php
 // You may want to set a custom transaction name:
-$service = t3lib_div::makeInstance('\AOE\Newrelic\Service');
+$service = GeneralUtility::makeInstance(\AOE\Newrelic\Service::class);
 $service->setTransactionNameOverride('Product Single View');
 
 //or just append something to the default name:
