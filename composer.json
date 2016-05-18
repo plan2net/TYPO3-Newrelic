@@ -8,14 +8,17 @@
       "name": "Reelworx GmbH",
       "role": "Developer",
       "homepage": "http://reelworx.at/"
+    },
+    {
+      "name": "Stefan Hekele",
+      "role": "Developer",
+      "homepage": "http://www.plan2.net/"
     }
   ],
-  "replace": {
-    "newrelic": "*"
-  },
   "require": {
-    "typo3/cms-core": "~6.2"
+    "typo3/cms-frontend": "*"
   },
+  "version": "1.0.1",
   "autoload": {
     "psr-4": {
       "AOE\\Newrelic\\": "Classes/"

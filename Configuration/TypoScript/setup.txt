@@ -1,0 +1,7 @@
+plugin.tx_newrelic {
+
+	transactionName = {$plugin.tx_newrelic.transactionName}
+	disableRum = {$plugin.tx_newrelic.disableRum}
+
+}
+

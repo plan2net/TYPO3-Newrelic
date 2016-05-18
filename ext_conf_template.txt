@@ -1,5 +1,20 @@
-# cat=basic; type=input; label=Newrelic Appname
-appname =
+	# cat=basic; type=input; label=Newrelic Appname (Frontend), doubles as fallback for Backend and CLI
+appnameFrontend =
 
-# cat=basic; type=boolean; label=Add memory usage to custom metric
+	# cat=basic; type=input; label=Newrelic Appname (Backend)
+appnameBackend =
+
+	# cat=basic; type=input; label=Newrelic Appname (CLI)
+appnameCli =
+
+	# cat=basic; type=boolean; label= Track page cache info, overrides cache_pages frontend cache handler
+track_page_cache_info = 1
+
+	# cat=basic; type=boolean; label= Add memory usage to custom metric
 track_memory = 1
+
+	# cat=basic; type=boolean; label= Prepend current context (Frontend/Backend/CLI) to transaction names
+prepend_context = 0
+
+	# cat=basic; type=boolean; label= Use page request path in transaction name, not recommended with > 1000 pages
+use_request_path = 0
