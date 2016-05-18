@@ -210,11 +210,11 @@ class Service implements SingletonInterface
             $this->setCustomParameter("TYPO3-NOCACHE", 1);
             $this->addTransactionNamePostfix('NOCACHE');
         }
-        if ($tsfe->isINTincScript) {
+        if ($tsfe->isINTincScript()) {
             $this->setCustomParameter("TYPO3-INTincScript", 1);
             $this->addTransactionNamePostfix('INTincScript');
         }
-        if ($tsfe->isClientCacheable) {
+        if ($tsfe->isClientCachable) {
             $this->setCustomParameter("TYPO3-ClientCacheable", 1);
             $this->addTransactionNamePostfix('ClientCacheable');
         }
