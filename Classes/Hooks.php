@@ -56,6 +56,14 @@ class Hooks
             newrelic_disable_autorum();
             $GLOBALS['TSFE']->content = str_ireplace('</head>', newrelic_get_browser_timing_header() . '</head>', $GLOBALS['TSFE']->content);
             $GLOBALS['TSFE']->content = str_ireplace('</body>', newrelic_get_browser_timing_footer() . '</body>', $GLOBALS['TSFE']->content);
+            // Refresh content length header if enabled
+            if (
+                (!isset($GLOBALS['TSFE']->config['config']['enableContentLengthHeader']) || $GLOBALS['TSFE']->config['config']['enableContentLengthHeader'])
+                && !$GLOBALS['TSFE']->beUserLogin && !$GLOBALS['TYPO3_CONF_VARS']['FE']['debug']
+                && !$GLOBALS['TSFE']->config['config']['debug'] && !$GLOBALS['TSFE']->doWorkspacePreview()
+            ) {
+                header('Content-Length: ' . strlen($GLOBALS['TSFE']->content));
+            }
         }
     }
 
