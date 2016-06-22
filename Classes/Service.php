@@ -325,7 +325,8 @@ class Service implements SingletonInterface
 
     public function addTransactionNamePostfix($name)
     {
-        if (empty($name)) {
+        // Don't add empty or duplicate name
+        if (!$name || strstr($this->transactionNamePostfix, $name)) {
             return;
         }
         $this->transactionNamePostfix .= '/' . $name;
