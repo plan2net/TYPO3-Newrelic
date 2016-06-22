@@ -54,8 +54,8 @@ class Hooks
             )
         ) {
             newrelic_disable_autorum();
-            $GLOBALS['TSFE']->additionalHeaderData['tx_newrelic'] = newrelic_get_browser_timing_header();
-            $GLOBALS['TSFE']->additionalFooterData['tx_newrelic'] = newrelic_get_browser_timing_footer();
+            $GLOBALS['TSFE']->content = str_ireplace('</head>', newrelic_get_browser_timing_header() . '</head>', $GLOBALS['TSFE']->content);
+            $GLOBALS['TSFE']->content = str_ireplace('</body>', newrelic_get_browser_timing_footer() . '</body>', $GLOBALS['TSFE']->content);
         }
     }
 
