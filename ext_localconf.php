@@ -6,7 +6,6 @@ $service = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\AOE\Newrelic\Se
 if ($service->getConfiguration('track_page_cache_info')) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['cache_pages']['frontend'] = '\AOE\Newrelic\Cache\Frontend\VariableFrontend';
 }
-$service->checkAndDisableAutoRum();
 $service->setConfiguredAppName();
 if ($service->getConfiguration('prepend_context')) {
     $service->setTransactionNameDefault('Base');
@@ -44,3 +43,4 @@ if (TYPO3_MODE === 'FE') {
     $TYPO3_CONF_VARS['SC_OPTIONS']['tslib/index_ts.php']['preprocessRequest']['newrelic'] = \AOE\Newrelic\Hooks::class . '->frontendPreprocessRequest';
     $TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['hook_eofe']['newrelic'] = \AOE\Newrelic\Hooks::class . '->frontendEndOfFrontend';
 }
+$service->checkAndDisableAutoRum();
