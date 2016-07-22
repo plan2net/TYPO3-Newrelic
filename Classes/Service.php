@@ -323,6 +323,23 @@ class Service implements SingletonInterface
         $this->cacheInfo = $cacheInfo;
     }
 
+    public function checkAndDisableAutoRum() {
+        if (!extension_loaded('newrelic')) {
+            return;
+        }
+        $disable = false;
+        if (defined('TYPO3_MODE') && TYPO3_MODE == 'BE' && $this->getConfiguration('disableRumBackend')) {
+            $disable = true;
+        } elseif (defined('TYPO3_cliMode') && TYPO3_cliMode) {
+            $disable = true;
+        } elseif (defined('TYPO3_MODE') && TYPO3_MODE == 'FE' && $this->getConfiguration('disableRumFrontend')) {
+            $disable = true;
+        }
+        if ($disable) {
+            newrelic_disable_autorum();
+        }
+    }
+
     public function addTransactionNamePostfix($name)
     {
         // Don't add empty or duplicate name

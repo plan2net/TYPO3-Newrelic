@@ -7,6 +7,12 @@ appnameBackend =
 	# cat=basic; type=input; label=Newrelic Appname (CLI)
 appnameCli =
 
+	# cat=basic; type=boolean; label= Disable RUM in Frontend (Global switch, can also be configured via TS)
+disableRumFronted = 0
+
+	# cat=basic; type=boolean; label= Disable RUM in Backend (Can break JS when enabled)
+disableRumBackend = 1
+
 	# cat=basic; type=boolean; label= Track page cache info, overrides cache_pages frontend cache handler
 track_page_cache_info = 1
 
